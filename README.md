@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AAC by Star Champs Indonesia
 
-## Getting Started
+> Alat Komunikasi Augmentatif dan Alternatif (AAC) berbasis Web untuk anak-anak dengan hambatan komunikasi verbal.
 
-First, run the development server:
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 15 (App Router, TypeScript) |
+| Styling | Tailwind CSS v4 + Nunito Font |
+| Database | Neon Serverless PostgreSQL + Drizzle ORM |
+| Media Storage | Vercel Blob |
+| Authentication | Auth.js v5 (Credentials) |
+| Hosting | Vercel |
+| Audio | Web Speech API (client-side) |
+
+## Features
+
+- **Papan Komunikasi (Kid Mode)** — full-screen AAC board with sentence builder, category tabs, and vocab cards
+- **Suara** — TTS via Web Speech API with pitch/speed controls, Indonesian voice priority, custom pronunciation overrides
+- **Mode Anak (Kid Mode Lock)** — full-screen lock with long-press 2s + 4-digit PIN to exit
+- **Admin Dashboard** — CRUD for categories and vocabulary cards
+- **Upload Gambar** — drag-and-drop photo upload to Vercel Blob
+- **PWA** — installable to homescreen with fullscreen manifest
+
+## Setup
+
+### 1. Copy environment variables
+
+```bash
+cp .env.example .env.local
+```
+
+Fill in:
+- `DATABASE_URL` — Neon pooled connection string
+- `DATABASE_URL_UNPOOLED` — Neon direct connection (for migrations)
+- `BLOB_READ_WRITE_TOKEN` — from Vercel Blob dashboard
+- `AUTH_SECRET` — generate with `openssl rand -hex 32`
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Run database migrations
+
+```bash
+npm run db:generate
+npm run db:migrate
+```
+
+### 4. Start development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000), register an account, and all default vocabulary will be seeded automatically.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Database Schema
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+users            → email/password accounts for parents/therapists
+app_settings     → per-user TTS pitch, speed, PIN code
+categories       → vocabulary categories (Frasa, Makanan, Binatang, etc.)
+vocabulary_cards → individual cards with word, emoji, or Blob image URL
+```
 
-## Learn More
+## Deployment to Vercel
 
-To learn more about Next.js, take a look at the following resources:
+1. Push to GitHub
+2. Import project in Vercel
+3. Add environment variables in Vercel dashboard
+4. Vercel will run `npm run vercel-build` which runs migrations then builds
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Routes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Route | Description |
+|---|---|
+| `/login` | Login page |
+| `/register` | Register page |
+| `/dashboard` | Admin overview |
+| `/dashboard/categories` | Category management |
+| `/dashboard/categories/[id]` | Card management per category |
+| `/dashboard/settings` | TTS, PIN settings |
+| `/board` | Kid Mode communication board |
